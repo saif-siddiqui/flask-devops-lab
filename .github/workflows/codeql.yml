@@ -1,26 +1,33 @@
 name: Lab 8 DevOps - CodeQL Analysis
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'
 
 jobs:
   analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
     permissions:
-      security-events: write
       actions: read
       contents: read
-
-    runs-on: ubuntu-latest
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v2
         with:
-          languages: python
-
+          languages: ${{ matrix.language }}
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v2
